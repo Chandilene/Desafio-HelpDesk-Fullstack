@@ -1,13 +1,14 @@
 import express from "express";
 
 import "express-async-errors";
-
+import { UPLOADS_FOLDER } from "./configs/upload";
 import { errorHandling } from "@/middlewares/error-handling";
 import { routes } from "./routes";
 
 const app = express();
 
 app.use(express.json());
+app.use("/files", express.static(UPLOADS_FOLDER));
 app.use(routes);
 
 app.use(errorHandling);

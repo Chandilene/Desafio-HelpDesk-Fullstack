@@ -1,9 +1,9 @@
 import { authConfig } from "@/configs/auth";
+import { Request, Response } from "express";
 import { prisma } from "@/database/prisma";
 import { AppError } from "@/utils/AppError";
 import jwt from "jsonwebtoken";
 import { compare } from "bcryptjs";
-import { Request, Response } from "express";
 import z from "zod";
 
 class SessionsController {
