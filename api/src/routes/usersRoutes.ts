@@ -13,11 +13,13 @@ const upload = multer(MULTER);
 const usersRoutes = Router();
 const usersController = new UsersController();
 
+usersRoutes.post("/", usersController.create);
+
 usersRoutes.post(
-  "/",
+  "/admin",
   ensureAuthenticated,
   verifyUserAuthorization(["ADMIN"]),
-  usersController.create,
+  usersController.createByAdmin,
 );
 
 usersRoutes.get(
@@ -27,19 +29,9 @@ usersRoutes.get(
   usersController.index,
 );
 
-usersRoutes.put(
-  "/:id",
-  ensureAuthenticated,
-  verifyUserAuthorization(["ADMIN"]),
-  usersController.update,
-);
+usersRoutes.put("/:id", ensureAuthenticated, usersController.update);
 
-usersRoutes.delete(
-  "/:id",
-  ensureAuthenticated,
-  verifyUserAuthorization(["ADMIN"]),
-  usersController.delete,
-);
+usersRoutes.delete("/:id", ensureAuthenticated, usersController.delete);
 
 usersRoutes.patch(
   "/avatar",
