@@ -1,14 +1,47 @@
+import { useActionState } from "react";
+import { z, ZodError } from "zod";
+import { AxiosError } from "axios";
+
+import { api } from "../services/api";
+import { useAuth } from "../hooks/useAuth";
+
 import { Input } from "../components/Input";
 import { Button } from "../components/Button";
 import { LinkButton } from "../components/LinkButton";
-import { useState } from "react";
+
+const signInSchema = z.object({
+  email: z.string().email({ message: "E-mail inválido" }),
+  password: z.string().trim().min(1, { message: "Informe a senha" }),
+});
+
 export function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  // const [isLoading, setIsLoading] = useState("");
-  function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    console.log(email, password);
+  const [state, formAction, isPending] = useActionState(signIn, null);
+
+  const auth = useAuth();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  async function signIn(_: any, formData: FormData) {
+    try {
+      const data = signInSchema.parse({
+        email: formData.get("email"),
+        password: formData.get("password"),
+      });
+
+      const response = await api.post("/sessions", data);
+
+      auth.save(response.data);
+    } catch (error) {
+      console.error("Erro na action:", error);
+      if (error instanceof ZodError) {
+        return { message: error.issues[0].message };
+      }
+
+      if (error instanceof AxiosError) {
+        return { message: error.response?.data.message };
+      }
+
+      return { message: "Não foi possivel fazer login" };
+    }
   }
   return (
     <div>
@@ -18,23 +51,30 @@ export function SignIn() {
           Entre usando seu e-mail e senha cadastrados
         </p>
 
-        <form onSubmit={onSubmit} className="w-full flex flex-col gap-4">
+        <form action={formAction} className="w-full flex flex-col gap-4">
           <Input
             required
+            name="email"
             legend="E_MAIL"
             type="email"
-            placeholder="exemlo@mail.com"
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="exemplo@mail.com"
           />
+
           <Input
             required
+            name="password"
             legend="SENHA"
             type="password"
             placeholder="Digite sua senha"
-            onChange={(e) => setPassword(e.target.value)}
           />
 
-          <Button type="submit">Entrar</Button>
+          <p className="text-sm text-red-600 text-center font-medium">
+            {state?.message}
+          </p>
+
+          <Button type="submit" isLoading={isPending}>
+            Entrar
+          </Button>
         </form>
       </div>
       <div className="max-w- align-center border border-gray-500 rounded-lg mt-6 p-6 ">
