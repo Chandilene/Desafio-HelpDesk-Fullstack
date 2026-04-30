@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { AppError } from "@/utils/AppError";
 import { prisma } from "@/database/prisma";
 import { z } from "zod";
+import { measureMemory } from "vm";
 
 class TicketsController {
   async create(request: Request, response: Response) {
@@ -110,6 +111,31 @@ class TicketsController {
     });
 
     return response.json(tickets);
+  }
+
+  async showDetails(request: Request, response: Response) {
+    const { id } = request.params;
+
+    const ticket = await prisma.ticket.findUnique({
+      where: { id },
+      include: {
+        technician: {
+          select: { name: true, email: true, avatar: true },
+        },
+        customer: {
+          select: { name: true },
+        },
+        services: {
+          include: { service: true },
+        },
+      },
+    });
+
+    if (!ticket) {
+      return response.status(404).json({ message: "Chamado não encontrado" });
+    }
+
+    return response.json(ticket);
   }
 
   async updateStatus(request: Request, response: Response) {
