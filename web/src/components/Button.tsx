@@ -1,23 +1,30 @@
 type Props = React.ComponentProps<"button"> & {
   isLoading?: boolean;
-  className?: "bg-gray-200";
 };
 
 export function Button({
   children,
   isLoading,
   type = "button",
-
+  className,
   ...rest
 }: Props) {
   return (
     <button
       type={type}
-      {...rest}
       disabled={isLoading}
-      className="flex items-center justify-center bg-gray-200 text-gray-600 py-2.5 rounded-lg hover:bg-gray-100 cursor-pointer"
+      className={`
+        flex items-center justify-center py-2.5 rounded-lg text-gray-600 transition-all
+        ${
+          isLoading
+            ? "bg-gray-400 opacity-70 cursor-not-allowed"
+            : "bg-gray-200 hover:bg-gray-100 cursor-pointer"
+        }
+        ${className} 
+      `}
+      {...rest}
     >
-      {children}
+      {isLoading ? "Carregando..." : children}
     </button>
   );
 }
