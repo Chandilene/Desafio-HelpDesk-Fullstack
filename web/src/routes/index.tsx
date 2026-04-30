@@ -1,15 +1,32 @@
 import { BrowserRouter } from "react-router";
-
-// import { AuthRoutes } from "./auth-routes";
-
-import { TicketRoutes } from "./ticket-routes";
+import { AuthRoutes } from "./auth-routes";
+import { CustomerRoutes } from "./customer-routes";
+import { useAuth } from "../hooks/useAuth";
+import { Loading } from "../components/Loading";
+import { AdminRoutes } from "./admin-routes";
+import { TechnicianRoutes } from "./technician-routes copy";
 
 export function Routes() {
-  return (
-    <BrowserRouter>
-      {/* <AuthRoutes /> */}
+  const { session, isLoading } = useAuth();
 
-      <TicketRoutes />
-    </BrowserRouter>
-  );
+  function getRoute() {
+    switch (session?.user.role.toUpperCase()) {
+      case "CUSTOMER":
+        return <CustomerRoutes />;
+
+      case "ADMIN":
+        return <AdminRoutes />;
+
+      case "TECHNICIAN":
+        return <TechnicianRoutes />;
+
+      default:
+        return <AuthRoutes />;
+    }
+  }
+
+  if (isLoading) {
+    return <Loading />;
+  }
+  return <BrowserRouter>{getRoute()}</BrowserRouter>;
 }
