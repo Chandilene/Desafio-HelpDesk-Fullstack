@@ -14,10 +14,14 @@
 
   --color-feedback-danger: #d03e3e;
   --color-feedback-open: #cc3d6a;
+  --color-feedback-bg-open: #cc3d6a33;
   --color-feedback-progress: #355ec5;
+  --color-feedback-bg-progress: #355ec533;
   --color-feedback-done: #508b26;
+  --color-feedback-bg-done: #508b2633;
 }
 
 :root {
   font-family: "Lato", sans-serif;
+  color: #355ec533;
 }
