@@ -104,9 +104,6 @@ export function AppLayout() {
         ${isMenuOpen ? "hidden md:flex" : "flex"} 
       `}
       >
-        <div className="px-8 pt-8 md:pt-12">
-          <h1 className="text-blue-dark text-3xl font-bold">Meus Chamados</h1>
-        </div>
         <div className="w-full px-8 flex-1">
           <Outlet />
         </div>

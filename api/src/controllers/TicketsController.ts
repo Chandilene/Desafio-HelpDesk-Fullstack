@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { AppError } from "@/utils/AppError";
 import { prisma } from "@/database/prisma";
 import { z } from "zod";
-import { measureMemory } from "vm";
 
 class TicketsController {
   async create(request: Request, response: Response) {
@@ -67,13 +66,11 @@ class TicketsController {
       },
     });
 
-    const totalValue = ticket.services.reduce((soma: number, item: any) => {
-      return soma + Number(item.service.price);
-    }, 0);
+    // const totalValue = ticket.services.reduce((soma: number, item: any) => {
+    //   return soma + Number(item.service.price);
+    // }, 0);
 
-    return response
-      .status(201)
-      .json({ ...ticket, totalValue: totalValue.toFixed(2) });
+    return response.status(201).json(ticket);
   }
   async index(request: Request, response: Response) {
     const { id: user_id, role } = request.user || {};
