@@ -16,7 +16,7 @@ class TicketsController {
         .string()
         .trim()
         .min(10, "Escreva a descrição com mais detalhes"),
-      technicianId: z.string().uuid("Selecione um técnico válido"),
+      technicianId: z.string().uuid("Selecione um técnico válido").optional(),
       services: z
         .array(z.string().uuid())
         .min(1, "Selecione pelo menos um serviço"),
@@ -26,12 +26,16 @@ class TicketsController {
       request.body,
     );
 
-    const technician = await prisma.user.findUnique({
-      where: { id: technicianId },
-    });
+    let technician = null;
 
-    if (!technician || technician.role !== "TECHNICIAN") {
-      throw new AppError("Técnico inválido");
+    if (technicianId) {
+      technician = await prisma.user.findUnique({
+        where: { id: technicianId },
+      });
+
+      if (!technician || technician.role !== "TECHNICIAN") {
+        throw new AppError("Técnico inválido");
+      }
     }
 
     const ticket = await prisma.ticket.create({
@@ -39,7 +43,7 @@ class TicketsController {
         title,
         description,
         customerId: customer_id,
-        technicianId,
+        technicianId: technician ? technician.id : null,
 
         services: {
           create: services.map((serviceId) => ({
@@ -65,10 +69,6 @@ class TicketsController {
         },
       },
     });
-
-    // const totalValue = ticket.services.reduce((soma: number, item: any) => {
-    //   return soma + Number(item.service.price);
-    // }, 0);
 
     return response.status(201).json(ticket);
   }

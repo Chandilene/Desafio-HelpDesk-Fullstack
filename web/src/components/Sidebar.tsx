@@ -1,10 +1,16 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { useAuth } from "../hooks/useAuth";
 
-export function Sidebar() {
+interface SidebarProps {
+  onCloseMenu: () => void;
+}
+
+export function Sidebar({ onCloseMenu }: SidebarProps) {
   const { session } = useAuth();
   const role = session?.user.role;
   const [activeTab, setActiveTab] = useState("tickets");
+  const navigate = useNavigate();
 
   const getActiveClass = (tabName: string) =>
     activeTab === tabName
@@ -18,14 +24,22 @@ export function Sidebar() {
           <button
             type="button"
             className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("tickets")}`}
-            onClick={() => setActiveTab("tickets")}
+            onClick={() => {
+              setActiveTab("tickets");
+              navigate("/");
+              onCloseMenu();
+            }}
           >
             <span>Meus chamados</span>
           </button>
           <button
             type="button"
             className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("newTickets")}`}
-            onClick={() => setActiveTab("newTickets")}
+            onClick={() => {
+              setActiveTab("newTickets");
+              navigate("/new");
+              onCloseMenu();
+            }}
           >
             <span>+ Criar chamado</span>
           </button>
@@ -37,7 +51,11 @@ export function Sidebar() {
           <button
             type="button"
             className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("tickets")}`}
-            onClick={() => setActiveTab("tickets")}
+            onClick={() => {
+              setActiveTab("tickets");
+              navigate("/");
+              onCloseMenu();
+            }}
           >
             <span>Meus chamados</span>
           </button>
@@ -49,28 +67,44 @@ export function Sidebar() {
           <button
             type="button"
             className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("tickets")}`}
-            onClick={() => setActiveTab("tickets")}
+            onClick={() => {
+              setActiveTab("tickets");
+              navigate("/");
+              onCloseMenu();
+            }}
           >
             <span>Chamados</span>
           </button>
           <button
             type="button"
             className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("tech")}`}
-            onClick={() => setActiveTab("tech")}
+            onClick={() => {
+              setActiveTab("tech");
+              navigate("/");
+              onCloseMenu();
+            }}
           >
             <span>Técnicos</span>
           </button>
           <button
             type="button"
             className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("customer")}`}
-            onClick={() => setActiveTab("customer")}
+            onClick={() => {
+              setActiveTab("customer");
+              navigate("/");
+              onCloseMenu();
+            }}
           >
             <span>Clientes</span>
           </button>
           <button
             type="button"
             className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("services")}`}
-            onClick={() => setActiveTab("services")}
+            onClick={() => {
+              setActiveTab("services");
+              navigate("/");
+              onCloseMenu();
+            }}
           >
             <span>Serviços</span>
           </button>

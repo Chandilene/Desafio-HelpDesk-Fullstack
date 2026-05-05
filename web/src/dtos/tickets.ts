@@ -13,6 +13,7 @@ export type Ticket = {
   };
   services: {
     service: {
+      id: string;
       name: string;
       price: number;
     };

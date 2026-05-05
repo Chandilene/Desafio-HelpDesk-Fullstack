@@ -165,7 +165,7 @@ export function TicketDetails() {
             <span className="text-gray-400 font-semibold text-sm">
               Adicionais
             </span>
-            {/* Lista de Adicionais */}
+
             {additionalServices.length > 0 && (
               <div className="mt-4">
                 <span className="text-gray-400 block mb-1">Adicionais</span>
