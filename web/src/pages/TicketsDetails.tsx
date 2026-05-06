@@ -6,7 +6,7 @@ import { calculateTicketTotal } from "../utils/calculateTotal";
 
 import { getById } from "../services/tickets";
 
-import { useAuth } from "../hooks/useAuth";
+// import { useAuth } from "../hooks/useAuth";
 import { api } from "../services/api";
 
 import { STATUS_VARIANTS } from "../constants/tickets";
@@ -20,7 +20,7 @@ export function TicketDetails() {
   const { id } = useParams<{ id: string }>();
 
   const navigate = useNavigate();
-  const auth = useAuth();
+  // const auth = useAuth();
 
   const baseService = ticket?.services[0];
 
@@ -62,7 +62,7 @@ export function TicketDetails() {
       <div className="px-8 pt-8 md:pt-12 flex flex-col items-start mb-4">
         <button
           onClick={() => navigate(-1)}
-          className="flex items-center justify-center gap-2 text-gray-300 font-semibold"
+          className="flex items-center justify-center gap-2 text-gray-300 font-semibold cursor-pointer"
         >
           <img src={backIcon} alt="" className="w-4 h-4" />
           Voltar
@@ -130,25 +130,33 @@ export function TicketDetails() {
           <span className="text-gray-400 font-semibold text-sm">
             Técnico responsável
           </span>
-          <div className="flex gap-2 mb-8">
-            <div className="w-8 h-8 rounded-full bg-blue-dark flex items-center justify-center">
-              {auth.session?.user?.avatar ? (
-                <img
-                  src={`${api.defaults.baseURL}/files/${auth.session.user.avatar}`}
-                  alt={auth.session.user.name}
-                  className="w-full h-full object-cover rounded-4xl"
-                />
-              ) : (
-                <span className="text-gray-400 font-bold text-sm">
-                  {getInitialsName(auth.session?.user.name || "")}
-                </span>
-              )}
+          {ticket?.technician ? (
+            <div className="flex gap-2 mb-8">
+              <div className="w-8 h-8 rounded-full bg-blue-dark flex items-center justify-center">
+                {ticket?.technician?.avatar ? (
+                  <img
+                    src={`${api.defaults.baseURL}/files/${ticket.technician?.avatar}`}
+                    alt={ticket.technician?.name}
+                    className="w-full h-full object-cover rounded-4xl"
+                  />
+                ) : (
+                  <span className="text-gray-400 font-bold text-sm">
+                    {getInitialsName(ticket.technician?.name || "")}
+                  </span>
+                )}
+              </div>
+              <div>
+                <p className="text-gray-200 text-xs ">
+                  {ticket?.technician?.name ?? ""}
+                </p>
+                <p className="text-gray-300 text-xs">
+                  {ticket?.technician?.email ?? ""}
+                </p>
+              </div>
             </div>
-            <div>
-              <p className="text-gray-200 text-xs ">Carlos Silva</p>
-              <p className="text-gray-300 text-xs">email@email.com</p>
-            </div>
-          </div>
+          ) : (
+            <span className="text-gray-300">Não atribuido</span>
+          )}
 
           <div>
             <span className="text-gray-400 font-semibold text-sm">Valores</span>

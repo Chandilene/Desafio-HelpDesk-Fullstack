@@ -8,6 +8,7 @@ type AuthContext = {
   session: null | UserAPIResponse;
   save: (data: UserAPIResponse) => void;
   remove: () => void;
+  updateProfile: (data: { user: User }) => void;
 };
 
 const LOCAL_STORAGE_KEY = "@helpdesk";
@@ -29,6 +30,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     api.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
 
     setSession(data);
+  }
+
+  async function updateProfile({ user }: { user: User }) {
+    // eslint-disable-next-line no-useless-catch
+    try {
+      const currentSession = session;
+
+      if (!currentSession) return;
+
+      const updatedSession = {
+        token: currentSession.token,
+        user: {
+          ...currentSession.user,
+          ...user,
+        },
+      };
+
+      localStorage.setItem(
+        `${LOCAL_STORAGE_KEY}:user`,
+        JSON.stringify(updatedSession.user),
+      );
+
+      setSession(updatedSession);
+    } catch (error) {
+      throw error;
+    }
   }
 
   function remove() {
@@ -60,7 +87,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ session, save, isLoading, remove }}>
+    <AuthContext.Provider
+      value={{ session, save, isLoading, remove, updateProfile }}
+    >
       {children}
     </AuthContext.Provider>
   );

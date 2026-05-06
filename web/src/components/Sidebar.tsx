@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
+import { ReactSVG } from "react-svg";
 import { useAuth } from "../hooks/useAuth";
+
+import addIcon from "../assets/icons/plus.svg";
+import listIcon from "../assets/icons/clipboard-list.svg";
+import usersIcon from "../assets/icons/users.svg";
+import clientIcon from "../assets/icons/briefcase-business.svg";
+import serviceIcon from "../assets/icons/wrench.svg";
 
 interface SidebarProps {
   onCloseMenu: () => void;
@@ -30,6 +37,7 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
               onCloseMenu();
             }}
           >
+            <ReactSVG src={listIcon} className="w-5 h-5 fill-current" />
             <span>Meus chamados</span>
           </button>
           <button
@@ -41,7 +49,8 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
               onCloseMenu();
             }}
           >
-            <span>+ Criar chamado</span>
+            <ReactSVG src={addIcon} className="w-5 h-5 fill-current" />
+            <span> Criar chamado</span>
           </button>
         </>
       )}
@@ -57,6 +66,7 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
               onCloseMenu();
             }}
           >
+            <ReactSVG src={listIcon} className="w-5 h-5 fill-current" />
             <span>Meus chamados</span>
           </button>
         </>
@@ -73,6 +83,7 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
               onCloseMenu();
             }}
           >
+            <ReactSVG src={listIcon} className="w-5 h-5 fill-current" />
             <span>Chamados</span>
           </button>
           <button
@@ -84,6 +95,7 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
               onCloseMenu();
             }}
           >
+            <ReactSVG src={usersIcon} className="w-5 h-5 fill-current" />
             <span>Técnicos</span>
           </button>
           <button
@@ -95,6 +107,7 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
               onCloseMenu();
             }}
           >
+            <ReactSVG src={clientIcon} className="w-5 h-5 fill-current" />
             <span>Clientes</span>
           </button>
           <button
@@ -106,6 +119,7 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
               onCloseMenu();
             }}
           >
+            <ReactSVG src={serviceIcon} className="w-5 h-5 fill-current" />
             <span>Serviços</span>
           </button>
         </>

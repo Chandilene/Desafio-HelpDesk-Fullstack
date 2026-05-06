@@ -1,22 +1,29 @@
-import { useState } from "react"; // 1. Importe o useState
+import { useState } from "react";
 import { Outlet } from "react-router";
-import logo from "../assets/Logo_IconLight.svg";
-import menuIcon from "../assets/icons/menu.svg";
+
 import { useAuth } from "../hooks/useAuth";
 import { api } from "../services/api";
+
 import { Sidebar } from "./Sidebar";
+import { ProfileModal } from "./ProfileModal";
+
+import { getInitialsName } from "../utils/getInitialsName";
+
+import logo from "../assets/Logo_IconLight.svg";
+import menuIcon from "../assets/icons/menu.svg";
+import userIcon from "../assets/icons/circle-user.svg";
+import logoutIcon from "../assets/icons/log-out.svg";
 
 export function AppLayout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
   const auth = useAuth();
 
-  const getInitialsName = (name: string) => {
-    if (!name) return "??";
-
-    const names = name.split(" ");
-    const first = names[0]?.[0] || "";
-    const last = names.length > 1 ? names[names.length - 1][0] : "";
-    return (first + last).toUpperCase();
+  const roleTranslations: Record<string, string> = {
+    ADMIN: "ADMIN",
+    TECHNICIAN: "TÉCNICO",
+    CUSTOMER: "CLIENTE",
   };
 
   return (
@@ -43,18 +50,103 @@ export function AppLayout() {
                 HelpDesk
               </h1>
               <span className="text-blue-light text-[10px] uppercase font-medium mt-1">
-                {auth.session?.user?.role}
+                {auth.session?.user?.role
+                  ? roleTranslations[auth.session.user.role] ||
+                    "ROLE NÃO MAPEADA"
+                  : "CARREGANDO..."}
               </span>
             </div>
           </div>
 
           {!isMenuOpen && (
-            <div className="w-12 h-12 rounded-full bg-blue-dark flex items-center justify-center md:hidden">
-              {auth.session?.user.avatar ? (
+            <div className="relative md:hidden">
+              <div
+                onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+                className="w-12 h-12 rounded-full bg-blue-dark flex items-center justify-center cursor-pointer overflow-hidden"
+              >
+                {auth.session?.user.avatar ? (
+                  <img
+                    src={`${api.defaults.baseURL}/files/${auth.session.user.avatar}`}
+                    alt={auth.session.user.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-white font-bold text-sm">
+                    {getInitialsName(auth.session?.user.name || "")}
+                  </span>
+                )}
+              </div>
+
+              {isProfileMenuOpen && (
+                <div className="absolute right-0 top-14 w-48 bg-gray-800 rounded-xl p-4 flex flex-col gap-4 shadow-2xl border border-gray-700 z-50">
+                  <p className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">
+                    Opções
+                  </p>
+                  <button
+                    onClick={() => {
+                      setIsProfileModalOpen(true);
+                      setIsProfileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-3 text-gray-600 hover:text-gray-400 transition-colors cursor-pointer"
+                  >
+                    <img src={userIcon} alt="" className="w-5 h-5" />
+                    <span className="text-sm">Perfil</span>
+                  </button>
+                  <button
+                    onClick={() => auth.remove()}
+                    className="flex items-center gap-3 text-red-500 hover:text-red-400 transition-colors cursor-pointer"
+                  >
+                    <img src={logoutIcon} alt="" className="w-5 h-5" />
+                    <span className="text-sm">Sair</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div
+          className={`${isMenuOpen ? "flex" : "hidden"} md:flex w-full flex-1`}
+        >
+          <Sidebar onCloseMenu={() => setIsMenuOpen(false)} />
+        </div>
+
+        <div className="hidden md:flex w-full flex-col relative mt-auto border-t border-gray-800 pt-6">
+          {isProfileMenuOpen && (
+            <div className="absolute bottom-24 left-0 w-full bg-black rounded-xl p-4 flex flex-col gap-4 shadow-lg border border-gray-800 z-50">
+              <p className="text-[10px] uppercase text-gray-500 font-bold tracking-wider">
+                Opções
+              </p>
+              <button
+                onClick={() => {
+                  setIsProfileModalOpen(true);
+                  setIsProfileMenuOpen(false);
+                }}
+                className="flex items-center gap-3 text-gray-600 hover:text-gray-400 transition-colors cursor-pointer"
+              >
+                <img src={userIcon} alt="" className="w-5 h-5" />
+                <span className="text-sm">Perfil</span>
+              </button>
+              <button
+                onClick={() => auth.remove()}
+                className="flex items-center gap-3 text-red-500 hover:text-red-400 transition-colors cursor-pointer"
+              >
+                <img src={logoutIcon} alt="" className="w-5 h-5" />
+                <span className="text-sm">Sair</span>
+              </button>
+            </div>
+          )}
+
+          <div
+            onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
+            className="flex items-center gap-4 cursor-pointer hover:bg-gray-800/50 p-2 rounded-lg transition-all"
+          >
+            <div className="w-12 h-12 rounded-full bg-blue-dark flex items-center justify-center overflow-hidden shrink-0">
+              {auth.session?.user?.avatar ? (
                 <img
                   src={`${api.defaults.baseURL}/files/${auth.session.user.avatar}`}
                   alt={auth.session.user.name}
-                  className="w-full h-full object-cover rounded-4xl"
+                  className="w-full h-full object-cover"
                 />
               ) : (
                 <span className="text-white font-bold text-sm">
@@ -62,38 +154,14 @@ export function AppLayout() {
                 </span>
               )}
             </div>
-          )}
-          <button
-            className="text-white cursor-pointer"
-            onClick={() => auth.remove()}
-          >
-            Sair
-          </button>
-        </div>
-
-        <div
-          className={`${isMenuOpen ? "flex" : "hidden"} md:flex w-full flex-1`}
-        >
-          <Sidebar />
-        </div>
-
-        <div className="hidden md:flex w-full items-center gap-10 mt-auto border-t border-gray-800 pt-6">
-          <div className="w-12 h-12 rounded-full bg-blue-dark flex items-center justify-center">
-            {auth.session?.user?.avatar ? (
-              <img
-                src={`${api.defaults.baseURL}/files/${auth.session.user.avatar}`}
-                alt={auth.session.user.name}
-                className="w-full h-full object-cover rounded-4xl"
-              />
-            ) : (
-              <span className="text-white font-bold text-sm">
-                {getInitialsName(auth.session?.user.name || "")}
-              </span>
-            )}
-          </div>
-          <div className="md:flex md:flex-col text-gray-600 text-sm">
-            <h4>{auth.session?.user.name}</h4>
-            <p className="text-xs text-gray-400">{auth.session?.user.email}</p>
+            <div className="flex flex-col text-sm truncate">
+              <h4 className="text-white font-medium truncate">
+                {auth.session?.user.name}
+              </h4>
+              <p className="text-xs text-gray-400 truncate">
+                {auth.session?.user.email}
+              </p>
+            </div>
           </div>
         </div>
       </header>
@@ -108,6 +176,10 @@ export function AppLayout() {
           <Outlet />
         </div>
       </main>
+      <ProfileModal
+        isOpen={isProfileModalOpen}
+        onClose={() => setIsProfileModalOpen(false)}
+      />
     </div>
   );
 }

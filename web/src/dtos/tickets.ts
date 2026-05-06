@@ -7,6 +7,8 @@ export type Ticket = {
   updatedAt: string;
   technician?: {
     name: string;
+    email: string;
+    avatar?: string;
   };
   customer?: {
     name: string;

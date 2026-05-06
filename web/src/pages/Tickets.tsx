@@ -58,7 +58,9 @@ export function Tickets() {
     <div>
       <div>
         {" "}
-        <h1 className="text-blue-dark text-3xl font-bold">Meus Chamados</h1>
+        <h1 className="text-blue-dark text-3xl font-bold mt-7">
+          Meus Chamados
+        </h1>
       </div>
 
       <div className="w-full border border-gray-500 rounded-2xl overflow-hidden mt-6 p-4">
