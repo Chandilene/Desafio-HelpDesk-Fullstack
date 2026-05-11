@@ -1,13 +1,21 @@
 import { Route, Routes } from "react-router";
-import { Tickets } from "../pages/Tickets";
+import { TicketsAdmin } from "../pages/TicketsAdmin";
 import { NotFound } from "../pages/NotFound";
 import { AppLayout } from "../components/AppLayout";
+import { TicketDetailsAdmin } from "../pages/TicketsDetailsAdmin";
+import { TableAllTechnician } from "../pages/TableAllTechnician";
+import { CreateTechnician } from "../pages/CreateTechnician";
+import { EditTechnician } from "../pages/EditTechnician";
 
 export function AdminRoutes() {
   return (
     <Routes>
       <Route path="/" element={<AppLayout />}>
-        <Route path="/" element={<Tickets />} />
+        <Route path="/" element={<TicketsAdmin />} />
+        <Route path="/details/:id" element={<TicketDetailsAdmin />} />
+        <Route path="/users" element={<TableAllTechnician />} />
+        <Route path="/users/admin" element={<CreateTechnician />} />
+        <Route path="/edit-technician/:id" element={<EditTechnician />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
