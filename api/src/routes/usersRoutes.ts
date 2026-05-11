@@ -29,6 +29,8 @@ usersRoutes.get(
   usersController.index,
 );
 
+usersRoutes.get("/:id", ensureAuthenticated, usersController.show);
+
 usersRoutes.put("/:id", ensureAuthenticated, usersController.update);
 
 usersRoutes.delete("/:id", ensureAuthenticated, usersController.delete);

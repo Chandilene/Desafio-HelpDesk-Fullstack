@@ -92,6 +92,15 @@ class UsersController {
     return response.json(users);
   }
 
+  async show(request: Request, response: Response) {
+    const { id } = request.params;
+    const user = await prisma.user.findUnique({ where: { id } });
+
+    if (!user) throw new AppError("Usuário não encontrado", 404);
+
+    return response.json(user);
+  }
+
   async update(request: Request, response: Response) {
     const { id } = request.params;
     const { id: user_id, role } = request.user as { id: string; role: string };

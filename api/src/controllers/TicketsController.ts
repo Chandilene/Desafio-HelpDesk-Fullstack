@@ -16,26 +16,38 @@ class TicketsController {
         .string()
         .trim()
         .min(10, "Escreva a descrição com mais detalhes"),
-      technicianId: z.string().uuid("Selecione um técnico válido").optional(),
       services: z
         .array(z.string().uuid())
         .min(1, "Selecione pelo menos um serviço"),
     });
 
-    const { title, description, technicianId, services } = bodySchema.parse(
-      request.body,
-    );
+    const { title, description, services } = bodySchema.parse(request.body);
 
-    let technician = null;
+    const technicians = await prisma.user.findMany({
+      where: {
+        role: "TECHNICIAN",
+      },
+      include: {
+        _count: {
+          select: {
+            assignedTickets: {
+              where: {
+                NOT: { status: "CLOSED" },
+              },
+            },
+          },
+        },
+      },
+    });
+    console.log(technicians);
 
-    if (technicianId) {
-      technician = await prisma.user.findUnique({
-        where: { id: technicianId },
-      });
+    let chosenTechnicianId = null;
 
-      if (!technician || technician.role !== "TECHNICIAN") {
-        throw new AppError("Técnico inválido");
-      }
+    if (technicians.length > 0) {
+      const sortedTechnicians = technicians?.sort(
+        (a, b) => a._count.assignedTickets - b._count.assignedTickets,
+      );
+      chosenTechnicianId = sortedTechnicians[0].id;
     }
 
     const ticket = await prisma.ticket.create({
@@ -43,7 +55,7 @@ class TicketsController {
         title,
         description,
         customerId: customer_id,
-        technicianId: technician ? technician.id : null,
+        technicianId: chosenTechnicianId,
 
         services: {
           create: services.map((serviceId) => ({
