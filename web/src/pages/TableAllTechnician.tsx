@@ -88,7 +88,7 @@ export function TableAllTechnician() {
             {technicians.map((technician) => (
               <tr key={technician.id}>
                 <td className=" flex gap-1.5 items-center font-bold w-20 md:w-50 text-xs py-4 px-4 text-gray-200 border-b border-gray-500">
-                  <div className="w-8 h-8 rounded-full bg-blue-dark flex items-center justify-center">
+                  <div className="w-7 h-7 rounded-full bg-blue-dark flex items-center justify-center shrink-0 overflow-hidden">
                     {technician.avatar ? (
                       <img
                         src={`${api.defaults.baseURL}/files/${technician.avatar}`}
@@ -102,7 +102,9 @@ export function TableAllTechnician() {
                     )}
                   </div>
 
-                  {technician.name}
+                  <p className="text-gray-200 font-bold block whitespace-nowrap">
+                    {technician.name}
+                  </p>
                 </td>
                 <td className="hidden md:text-gray-200 md:text-xs md:table-cell font-semibold border-b border-gray-500">
                   {technician.email}
