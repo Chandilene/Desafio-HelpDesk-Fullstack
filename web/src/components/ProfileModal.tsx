@@ -3,6 +3,8 @@ import { AxiosError } from "axios";
 import { api } from "../services/api";
 import { useAuth } from "../hooks/useAuth";
 
+import { Alert } from "../components/Alert";
+
 import { getInitialsName } from "../utils/getInitialsName";
 import { Input } from "../components/Input";
 
@@ -23,6 +25,11 @@ interface ApiErrorData {
 export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const auth = useAuth();
 
+  const [alertData, setAlertData] = useState<{
+    msg: string;
+    type: "success" | "error";
+  } | null>(null);
+
   const [name, setName] = useState(auth.session?.user.name || "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
@@ -31,6 +38,13 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
   const userId = auth.session?.user.id;
+
+  const closeModal = () => {
+    setTimeout(() => {
+      setAlertData(null);
+      onClose();
+    }, 3000);
+  };
 
   function handleChangeAvatar(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -64,15 +78,20 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
         user: { name, avatar: avatarName },
       });
 
-      alert("Perfil atualizado com sucesso!");
+      setAlertData({ msg: "Perfil atualizado com sucesso!", type: "success" });
 
-      onClose();
+      closeModal();
     } catch (err) {
       const error = err as AxiosError<ApiErrorData>;
       console.error("erro do error: ", error.response);
       const message =
         error.response?.data?.message || "Não foi possível atualizar o perfil.";
-      alert(message);
+
+      setAlertData({
+        msg: message,
+        type: "error",
+      });
+      closeModal();
     }
   }
 
@@ -220,6 +239,13 @@ export function ProfileModal({ isOpen, onClose }: ProfileModalProps) {
             Salvar
           </button>
         </div>
+        {alertData && (
+          <Alert
+            message={alertData.msg}
+            type={alertData.type}
+            onClose={() => setAlertData(null)}
+          />
+        )}
       </div>
     </div>
   );
