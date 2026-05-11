@@ -17,7 +17,7 @@ export function Input({ legend, className, ...rest }: Props) {
 
       <input
         type="text"
-        className={`w-full h-12  border-b border-gray-400 px-4 text-sm text-gray-100 bg-transparent outline-0 ${className}`}
+        className={`w-full h-8  border-b border-gray-400 px-4 text-sm text-gray-100 bg-transparent outline-0 ${className}`}
         {...rest}
       />
     </fieldset>

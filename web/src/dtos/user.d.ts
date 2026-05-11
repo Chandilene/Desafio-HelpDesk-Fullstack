@@ -8,6 +8,7 @@ type User = {
   role?: string;
   password?: string;
   old_password?: string;
+  schedule?: string[];
 };
 
 type UserAPIResponse = {

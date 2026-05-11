@@ -12,6 +12,7 @@ export type Ticket = {
   };
   customer?: {
     name: string;
+    avatar?: string;
   };
   services: {
     service: {
