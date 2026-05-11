@@ -95,8 +95,8 @@ export function Tickets() {
           <tbody className="w-full ">
             {tickets.map((ticket) => (
               <tr key={ticket.id}>
-                <td className=" w-20 md:w-28 text-xs text-gray-200 border-b border-gray-500">
-                  13/04/25 20:56
+                <td className=" w-20 md:w-28 text-xs py-4 px-4 text-gray-200 border-b border-gray-500">
+                  {ticket.updatedAt}
                 </td>
                 <td className="hidden md:text-gray-200 md:text-xs md:table-cell font-semibold border-b border-gray-500">
                   {ticket.id}
@@ -111,7 +111,7 @@ export function Tickets() {
                   {formatCurrency(calculateTicketTotal(ticket.services))}
                 </td>
                 <td className="hidden md:text-gray-200 md:text-sm md:table-cell border-b border-gray-500">
-                  {ticket.technician?.name}
+                  {ticket.technician?.name || "Pendente"}
                 </td>
                 <td className="table-cell border-b border-gray-500 text-center">
                   {(() => {

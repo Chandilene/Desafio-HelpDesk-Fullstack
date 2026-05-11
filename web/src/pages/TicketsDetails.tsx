@@ -94,7 +94,7 @@ export function TicketDetails() {
             })()}
           </div>
         </div>
-        <p className="text-gray-200 font-bold ">Backup não está funcionando </p>
+        <p className="text-gray-200 font-bold ">{ticket?.title} </p>
         <div>
           <span className="text-gray-400 font-semibold text-sm">Descrição</span>
           <p className="text-sm text-gray-200">{ticket?.description}</p>
