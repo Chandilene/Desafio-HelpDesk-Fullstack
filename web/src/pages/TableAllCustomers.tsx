@@ -1,40 +1,88 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { api } from "../services/api";
 import { getCustomers } from "../services/users";
 import { getInitialsName } from "../utils/getInitialsName";
 
 import editIcon from "../assets/icons/pen-line.svg";
 import trashIcon from "../assets/icons/trash.svg";
+import { EditCustomerModal } from "../components/EditCustomerModal";
+import { ConfirmDeleteModal } from "../components/ConfirmDeleteModal";
+import { Alert } from "../components/Alert";
+import type { AxiosError } from "axios";
 
-export function TableAllCostumers() {
+interface ApiErrorData {
+  message: string;
+}
+
+export function TableAllCustomers() {
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [users, setUsers] = useState<User[]>([]);
 
+  const [alertData, setAlertData] = useState<{
+    msg: string;
+    type: "success" | "error";
+  } | null>(null);
+
   const [loading, setLoading] = useState(true);
+
+  function handleEditClick(user: User) {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
+    setIsDeleteModalOpen(false);
+  }
+
+  function handleDeleteClick(user: User) {
+    setSelectedUser(user);
+    setIsDeleteModalOpen(true);
+    setIsEditModalOpen(false);
+  }
+
+  async function confirmDelete() {
+    if (!selectedUser) return;
+
+    try {
+      await api.delete(`/users/${selectedUser.id}`);
+
+      setIsDeleteModalOpen(false);
+      setSelectedUser(null);
+      setAlertData({ msg: "Cliente removido com sucesso!", type: "success" });
+      loadAllCustomers();
+    } catch (err) {
+      const error = err as AxiosError<ApiErrorData>;
+      setAlertData({
+        msg: error.response?.data?.message || "Erro ao atualizar cliente.",
+        type: "error",
+      });
+    }
+  }
+
+  const loadAllCustomers = useCallback(async (isMounted = true) => {
+    try {
+      const response = await getCustomers();
+      if (isMounted) {
+        setUsers(response);
+      }
+    } catch (error) {
+      console.log("Erro ao carregar:", error);
+    } finally {
+      if (isMounted) {
+        setLoading(false);
+      }
+    }
+  }, []);
+
   useEffect(() => {
     let mounted = true;
+    (async () => {
+      await loadAllCustomers(mounted);
+    })();
 
-    const loadAllTechnicians = async () => {
-      try {
-        const response = await getCustomers();
-
-        if (mounted) {
-          setUsers(response);
-        }
-        console.log("clientes listados", response);
-      } catch (error) {
-        console.log("Erro :", error);
-      } finally {
-        if (mounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    loadAllTechnicians();
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [loadAllCustomers]);
 
   if (loading) return <p>Carregando clientes...</p>;
   return (
@@ -75,7 +123,7 @@ export function TableAllCostumers() {
                   </p>
                 </td>
                 <td className=" md:text-gray-200 md:text-xs md:table-cell border-b border-gray-500">
-                  <span className="text-gray-200 text-sm   block max-w-30 md:max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                  <span className="text-gray-200 text-sm  q block max-w-30 md:max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
                     {u.email}
                   </span>
                 </td>
@@ -83,7 +131,7 @@ export function TableAllCostumers() {
                 <td className="table-cell border-b border-gray-500 text-center align-middle">
                   <div className="flex justify-center items-center gap-2 h-full">
                     <button
-                      //   onClick={() => u.id && handleEdit(u.id)}
+                      onClick={() => u.id && handleDeleteClick(u)}
                       type="button"
                       className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer bg-gray-500"
                     >
@@ -94,7 +142,7 @@ export function TableAllCostumers() {
                       />
                     </button>
                     <button
-                      //   onClick={() => u.id && handleRemove(u.id)}
+                      onClick={() => u.id && handleEditClick(u)}
                       type="button"
                       className="w-8 h-8 flex items-center justify-center rounded-lg cursor-pointer bg-gray-500"
                     >
@@ -111,6 +159,30 @@ export function TableAllCostumers() {
           </tbody>
         </table>
       </div>
+      <EditCustomerModal
+        key={selectedUser?.id}
+        isOpen={isEditModalOpen}
+        user={selectedUser}
+        onClose={() => setSelectedUser(null)}
+        onUpdate={loadAllCustomers}
+      />
+      <ConfirmDeleteModal
+        isOpen={isDeleteModalOpen}
+        userName={selectedUser?.name || ""}
+        onClose={() => {
+          setIsDeleteModalOpen(false);
+          setSelectedUser(null);
+        }}
+        onConfirm={confirmDelete}
+      />
+
+      {alertData && (
+        <Alert
+          message={alertData.msg}
+          type={alertData.type}
+          onClose={() => setAlertData(null)}
+        />
+      )}
     </div>
   );
 }
