@@ -45,10 +45,10 @@ export function TableAllCostumers() {
         <table className="w-full border-separate border-spacing-0">
           <thead>
             <tr>
-              <th className=" md:w-30 text-gray-400 text-sm text-left border-b border-gray-500">
+              <th className=" md:w-35 text-gray-400 text-sm text-left border-b border-gray-500">
                 Nome
               </th>
-              <th className="hidden md:text-gray-400 md:text-sm md:table-cell text-left border-b border-gray-500">
+              <th className="md:w-35 text-gray-400 md:text-sm md:table-cell text-left border-b border-gray-500">
                 E-mail
               </th>
             </tr>
@@ -56,7 +56,7 @@ export function TableAllCostumers() {
           <tbody className="w-full ">
             {users.map((u) => (
               <tr key={u.id} className="group">
-                <td className=" flex gap-1.5 items-center font-bold w-20 md:w-50 text-xs py-4 px-4 text-gray-200 border-b border-gray-500">
+                <td className=" flex gap-1.5 items-center shrink-0 font-bold w-25 md:w-50 text-xs py-4 px-4 text-gray-200 border-b border-gray-500">
                   <div className="w-7 h-7 rounded-full bg-blue-dark flex items-center justify-center shrink-0 overflow-hidden">
                     {u.avatar ? (
                       <img
@@ -70,12 +70,12 @@ export function TableAllCostumers() {
                       </span>
                     )}
                   </div>
-                  <p className="text-gray-200 font-bold block whitespace-nowrap ">
+                  <p className="text-gray-200 font-bold  block max-w-30 md:max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
                     {u.name}
                   </p>
                 </td>
-                <td className="hidden md:text-gray-200 md:text-xs md:table-cell border-b border-gray-500">
-                  <span className="text-gray-200 text-sm truncate w-25">
+                <td className=" md:text-gray-200 md:text-xs md:table-cell border-b border-gray-500">
+                  <span className="text-gray-200 text-sm   block max-w-30 md:max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
                     {u.email}
                   </span>
                 </td>
