@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { ReactSVG } from "react-svg";
 import { useAuth } from "../hooks/useAuth";
 
@@ -16,11 +15,12 @@ interface SidebarProps {
 export function Sidebar({ onCloseMenu }: SidebarProps) {
   const { session } = useAuth();
   const role = session?.user.role;
-  const [activeTab, setActiveTab] = useState("tickets");
-  const navigate = useNavigate();
 
-  const getActiveClass = (tabName: string) =>
-    activeTab === tabName
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const getActiveClass = (path: string) =>
+    location.pathname === path
       ? "bg-blue-dark text-white"
       : "bg-transparent text-gray-400 hover:bg-gray-800";
 
@@ -30,9 +30,8 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
         <>
           <button
             type="button"
-            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("tickets")}`}
+            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("/")}`}
             onClick={() => {
-              setActiveTab("tickets");
               navigate("/");
               onCloseMenu();
             }}
@@ -42,9 +41,8 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
           </button>
           <button
             type="button"
-            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("newTickets")}`}
+            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("/new")}`}
             onClick={() => {
-              setActiveTab("newTickets");
               navigate("/new");
               onCloseMenu();
             }}
@@ -59,9 +57,8 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
         <>
           <button
             type="button"
-            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("tickets")}`}
+            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("/")}`}
             onClick={() => {
-              setActiveTab("tickets");
               navigate("/");
               onCloseMenu();
             }}
@@ -76,9 +73,8 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
         <>
           <button
             type="button"
-            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("tickets")}`}
+            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("/")}`}
             onClick={() => {
-              setActiveTab("tickets");
               navigate("/");
               onCloseMenu();
             }}
@@ -88,9 +84,8 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
           </button>
           <button
             type="button"
-            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("tech")}`}
+            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("/users")}`}
             onClick={() => {
-              setActiveTab("tech");
               navigate("/users");
               onCloseMenu();
             }}
@@ -100,9 +95,8 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
           </button>
           <button
             type="button"
-            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("customer")}`}
+            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("/customers")}`}
             onClick={() => {
-              setActiveTab("customer");
               navigate("/customers");
               onCloseMenu();
             }}
@@ -112,9 +106,8 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
           </button>
           <button
             type="button"
-            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("services")}`}
+            className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("/services")}`}
             onClick={() => {
-              setActiveTab("services");
               navigate("/services");
               onCloseMenu();
             }}
