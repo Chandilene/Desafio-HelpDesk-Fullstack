@@ -2,19 +2,19 @@ import { useState } from "react";
 import { AxiosError } from "axios";
 import { api } from "../services/api";
 import type { ServiceDTO } from "../dtos/service";
-import { Alert } from "../components/Alert";
+import { Alert } from "./Alert";
 
-import { Input } from "../components/Input";
+import { Input } from "./Input";
 
 import closeIcon from "../assets/icons/x.svg";
 import { formatCurrency } from "../utils/formatCurrency";
 import { z, ZodError } from "zod";
 
-interface CreateServiceModalProps {
+interface ServiceModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreate: () => void;
-  service: ServiceDTO | null;
+  onSubmit: () => void;
+  service?: ServiceDTO | null;
 }
 
 interface ApiErrorData {
@@ -26,37 +26,48 @@ const bodySchema = z.object({
   price: z.number().positive("O preço deve ser um valor positivo"),
 });
 
-export function CreateServiceModal({
+export function ServiceModal({
   isOpen,
   onClose,
-  onCreate,
-}: CreateServiceModalProps) {
+  onSubmit,
+  service,
+}: ServiceModalProps) {
   const [alertData, setAlertData] = useState<{
     msg: string;
     type: "success" | "error";
   } | null>(null);
 
-  const [name, setName] = useState("");
-  const [value, setValue] = useState("");
+  const [name, setName] = useState(service?.name || "");
+  const [value, setValue] = useState(
+    service ? String(service.price * 100) : "",
+  );
 
   const closeModal = () => {
     setAlertData(null);
     onClose();
   };
 
-  async function handleCreate() {
+  async function handleSubmit() {
     try {
-      const result = bodySchema.parse({
+      const data = bodySchema.parse({
         name,
         price: Number(value) / 100,
       });
-      await api.post("/services", result);
-      setName("");
-      setValue("");
 
-      setAlertData({ msg: "Serviço criado com sucesso!", type: "success" });
+      if (service) {
+        await api.put(`/services/${service.id}`, data);
+        setAlertData({
+          msg: "Serviço atualizado com sucesso!",
+          type: "success",
+        });
+      } else {
+        await api.post("/services", data);
+        setAlertData({ msg: "Serviço criado com sucesso!", type: "success" });
+        setName("");
+        setValue("");
+      }
 
-      onCreate();
+      onSubmit();
 
       setTimeout(closeModal, 2000);
       setName("");
@@ -75,6 +86,17 @@ export function CreateServiceModal({
       });
     }
   }
+  // useEffect(() => {
+  //   if (isOpen) {
+  //     if (service) {
+  //       setName(service.name);
+  //       setValue(String(service.price * 100));
+  //     } else {
+  //       setName("");
+  //       setValue("");
+  //     }
+  //   }
+  // }, [isOpen, service]);
 
   if (!isOpen) return null;
 
@@ -83,7 +105,7 @@ export function CreateServiceModal({
       <div className="bg-white w-full max-w-125 rounded-2xl overflow-hidden shadow-2xl">
         <div className="flex items-center justify-between px-8 py-6 border-b border-gray-500 relative">
           <h2 className="text-xl font-bold text-gray-900">
-            Cadastro de serviço
+            {service ? "Serviço" : "Cadastro de serviço"}
           </h2>
           <button onClick={onClose} className="p-1 cursor-pointer">
             <img src={closeIcon} alt="Fechar" />
@@ -112,7 +134,7 @@ export function CreateServiceModal({
           </div>
 
           <button
-            onClick={handleCreate}
+            onClick={handleSubmit}
             className="w-full bg-gray-900 text-white font-bold py-4 rounded-xl mt-4 hover:bg-gray-800 transition-all cursor-pointer"
           >
             Salvar

@@ -1,55 +1,84 @@
+import { useEffect, useState, useCallback } from "react";
+import type { ServiceDTO } from "../dtos/service";
+
 import editIcon from "../assets/icons/pen-line.svg";
 import plusWhiteIcon from "../assets/icons/plusWhite.svg";
-// import blockIcon from "../assets/icons/ban.svg";
-import blockRedIcon from "../assets/icons/TagStatusRed.svg";
-// import checkGreenIcon from "../assets/icons/TagStatusGreen.svg";
-import checkIcon from "../assets/icons/circle-check.svg";
 
-// import { useEffect, useState } from "react";
 import { Button } from "../components/Button";
-// import { api } from "../services/api";
+import { getServices } from "../services/services";
+import { SERVICE_STATUS_VARIANTS } from "../constants/services";
 
-// import { useNavigate } from "react-router";
+import { formatCurrency } from "../utils/formatCurrency";
+import { api } from "../services/api";
+import { Alert } from "../components/Alert";
+import type { AxiosError } from "axios";
+
+import { ServiceModal } from "../components/ServiceModal";
+
+interface ApiErrorData {
+  message: string;
+}
 
 export function TableAllServices() {
-  // const navigate = useNavigate();
+  const [selectedService, setSelectedService] = useState<ServiceDTO | null>(
+    null,
+  );
+  const [services, setServices] = useState<ServiceDTO[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // const [loading, setLoading] = useState(true);
+  const [alertData, setAlertData] = useState<{
+    msg: string;
+    type: "success" | "error";
+  } | null>(null);
 
-  // function handleEdit(id: string) {
-  //   navigate(`/edit-technician/${id}`);
-  // }
-  // function handleCreateTech() {
-  //   navigate("/services");
-  // }
+  const loadAllServices = useCallback(async (isMounted = true) => {
+    try {
+      const response = await getServices();
+      if (isMounted) {
+        setServices(response);
+      }
+    } catch (error) {
+      console.log("Erro ao carregar:", error);
+    } finally {
+      if (isMounted) {
+        setLoading(false);
+      }
+    }
+  }, []);
 
-  // useEffect(() => {
-  //   let mounted = true;
+  useEffect(() => {
+    let mounted = true;
+    (async () => {
+      await loadAllServices(mounted);
+    })();
 
-  //   const loadAllTechnicians = async () => {
-  //     try {
-  //       const response = await getTechnicians();
+    return () => {
+      mounted = false;
+    };
+  }, [loadAllServices]);
 
-  //       if (mounted) {
-  //         setTechnicians(response);
-  //       }
-  //       console.log("tecnicos listados", response);
-  //     } catch (error) {
-  //       console.log("Erro :", error);
-  //     } finally {
-  //       if (mounted) {
-  //         setLoading(false);
-  //       }
-  //     }
-  //   };
+  async function handleChangeStatus(id: string, currentStatus: boolean) {
+    try {
+      const newStatus = !currentStatus;
+      await api.put(`/services/${id}`, { isActive: newStatus });
+      setAlertData({
+        msg: "O status do serviço foi alterado",
+        type: "success",
+      });
+      await loadAllServices();
+    } catch (err) {
+      const error = err as AxiosError<ApiErrorData>;
+      setAlertData({
+        msg:
+          error.response?.data?.message ||
+          "Erro ao atualizar status do serviço.",
+        type: "error",
+      });
+    }
+  }
 
-  //   loadAllTechnicians();
-  //   return () => {
-  //     mounted = false;
-  //   };
-  // }, []);
-
-  // if (loading) return <p>Carregando tecnicos...</p>;
+  if (loading) return <p>Carregando clientes...</p>;
 
   return (
     <div>
@@ -58,7 +87,10 @@ export function TableAllServices() {
         <h1 className="text-blue-dark text-3xl font-bold mt-7">Serviços</h1>
         <Button
           className="flex gap-2 justify-center px-4 mt-7"
-          // onClick={() => handleCreateTech()}
+          onClick={() => {
+            setSelectedService(null);
+            setIsModalOpen(true);
+          }}
         >
           <img src={plusWhiteIcon} alt="" />
           <span className="hidden md:block">NOVO</span>
@@ -83,54 +115,91 @@ export function TableAllServices() {
           </thead>
 
           <tbody className="w-full ">
-            <tr className="hover:bg-gray-50 transition-colors">
-              <td className="border-b border-gray-500 px-2 py-5 text-sm shrink-0 overflow-hidden">
-                <p className="text-gray-200   block max-w-16 md:max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
-                  Instalação de Rede
-                </p>
-              </td>
-              <td className="text-gray-900 whitespace-nowrap text-xs md:text-sm border-b border-gray-500 px-2 py-5">
-                R$ 180,00
-              </td>
-              <td className="border-b border-gray-500 px-2 py-5">
-                <span className="hidden md:inline-block bg-red-100 text-red-700 text-[10px] md:text-xs font-bold px-2 py-1 rounded-full uppercase">
-                  Inativo
-                </span>
-                <img
-                  src={blockRedIcon}
-                  alt="Reativar"
-                  className="w-7 h-7 min-w-7 min-h-7 shrink-0 md:hidden"
-                />
-              </td>
+            {services.map((service) => {
+              const statusKey = service.isActive ? "active" : "inactive";
+              const variant = SERVICE_STATUS_VARIANTS[statusKey];
 
-              <td className="border-b border-gray-500 px-2 py-5 text-right">
-                <div className="flex justify-end items-center gap-1 md:gap-2">
-                  <button className="flex items-center justify-center gap-2 p-2.5 hover:bg-gray-500 rounded-xl text-gray-300 font-bold text-sm transition-colors cursor-pointer min-w-9 min-h-9">
+              return (
+                <tr
+                  key={service.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <td className="border-b border-gray-500 px-2 py-5 text-sm shrink-0 overflow-hidden">
+                    <p className="text-gray-200   block max-w-16 md:max-w-full overflow-hidden text-ellipsis whitespace-nowrap">
+                      {service.name}
+                    </p>
+                  </td>
+                  <td className="text-gray-900 whitespace-nowrap text-xs md:text-sm border-b border-gray-500 px-2 py-5">
+                    {formatCurrency(service.price)}
+                  </td>
+                  <td className="border-b border-gray-500 px-2 py-5">
+                    <span
+                      className={`hidden md:inline-block  text-[10px] md:text-xs font-bold px-2 py-1 rounded-full uppercase ${variant.badgeClasses}`}
+                    >
+                      {variant.label}
+                    </span>
                     <img
-                      src={checkIcon}
-                      alt="Reativar serviço"
-                      className="w-6 h-6 min-w-6 min-h-6 shrink-0 opacity-80"
+                      src={variant.badgeIcon}
+                      alt={variant.label}
+                      className="w-7 h-7 min-w-7 min-h-7 shrink-0 md:hidden"
                     />
+                  </td>
 
-                    <span className="hidden md:block">Reativar</span>
-                  </button>
+                  <td className="border-b border-gray-500 px-2 py-5 text-right">
+                    <div className="flex justify-end items-center gap-1 md:gap-2">
+                      <button
+                        onClick={() =>
+                          handleChangeStatus(service.id, service.isActive)
+                        }
+                        className={`flex items-center justify-center gap-2 p-2.5 hover:bg-gray-500 rounded-xl text-gray-300 font-bold text-sm transition-colors cursor-pointer min-w-9 min-h-9 ${variant.buttonClasses}`}
+                      >
+                        <img
+                          src={variant.buttonIcon}
+                          alt="Reativar serviço"
+                          className="w-6 h-6 min-w-6 min-h-6 shrink-0 opacity-80"
+                        />
 
-                  <button
-                    title="Editar"
-                    className="p-2 bg-gray-500 hover:bg-gray-600 rounded-xl transition-colors cursor-pointer flex items-center justify-center min-w-9 min-h-9"
-                  >
-                    <img
-                      src={editIcon}
-                      alt="Editar"
-                      className="w-6 h-6 min-w-6 min-h-6 shrink-0 opacity-80"
-                    />
-                  </button>
-                </div>
-              </td>
-            </tr>
+                        <span className="hidden md:block">
+                          {variant.buttonLabel}
+                        </span>
+                      </button>
+
+                      <button
+                        onClick={() => {
+                          setSelectedService(service);
+                          setIsModalOpen(true);
+                        }}
+                        title="Editar"
+                        className="p-2 bg-gray-500 hover:bg-gray-600 rounded-xl transition-colors cursor-pointer flex items-center justify-center min-w-9 min-h-9"
+                      >
+                        <img
+                          src={editIcon}
+                          alt="Editar"
+                          className="w-6 h-6 min-w-6 min-h-6 shrink-0 opacity-80"
+                        />
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
           </tbody>
         </table>
       </div>
+      <ServiceModal
+        key={selectedService?.id || "new"}
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onSubmit={() => loadAllServices()}
+        service={selectedService} // Se for criação, passe null
+      />
+      {alertData && (
+        <Alert
+          message={alertData.msg}
+          type={alertData.type}
+          onClose={() => setAlertData(null)}
+        />
+      )}
     </div>
   );
 }
