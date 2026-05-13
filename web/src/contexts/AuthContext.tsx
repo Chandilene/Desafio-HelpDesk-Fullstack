@@ -59,11 +59,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   function remove() {
-    setSession(null);
     localStorage.removeItem(`${LOCAL_STORAGE_KEY}:user`);
     localStorage.removeItem(`${LOCAL_STORAGE_KEY}:token`);
 
     window.location.assign("/");
+    setSession(null);
   }
 
   function loadUser() {

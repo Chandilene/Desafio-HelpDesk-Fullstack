@@ -4,7 +4,7 @@ import { CustomerRoutes } from "./customer-routes";
 import { useAuth } from "../hooks/useAuth";
 import { Loading } from "../components/Loading";
 import { AdminRoutes } from "./admin-routes";
-import { TechnicianRoutes } from "./technician-routes copy";
+import { TechnicianRoutes } from "./technician-routes";
 
 export function Routes() {
   const { session, isLoading } = useAuth();
