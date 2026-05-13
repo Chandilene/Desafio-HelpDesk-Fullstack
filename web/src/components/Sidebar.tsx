@@ -115,7 +115,7 @@ export function Sidebar({ onCloseMenu }: SidebarProps) {
             className={`w-full p-4 rounded-xl flex items-center gap-3 cursor-pointer ${getActiveClass("services")}`}
             onClick={() => {
               setActiveTab("services");
-              navigate("/");
+              navigate("/services");
               onCloseMenu();
             }}
           >

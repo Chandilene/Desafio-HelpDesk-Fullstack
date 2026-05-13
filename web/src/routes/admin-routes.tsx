@@ -7,6 +7,7 @@ import { TableAllTechnician } from "../pages/TableAllTechnician";
 import { CreateTechnician } from "../pages/CreateTechnician";
 import { EditTechnician } from "../pages/EditTechnician";
 import { TableAllCustomers } from "../pages/TableAllCustomers";
+import { TableAllServices } from "../pages/TableAllServices";
 
 export function AdminRoutes() {
   return (
@@ -18,6 +19,7 @@ export function AdminRoutes() {
         <Route path="/users/admin" element={<CreateTechnician />} />
         <Route path="/edit-technician/:id" element={<EditTechnician />} />
         <Route path="/customers" element={<TableAllCustomers />} />
+        <Route path="/services" element={<TableAllServices />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>
